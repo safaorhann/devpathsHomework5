@@ -1,2 +1,2 @@
-Flask==2.2.2
-Hashlib==3.10.8
+Flask
+Hashlib
