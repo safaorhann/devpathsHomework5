@@ -1,2 +1,2 @@
 Flask
-Hashlib
+Hashlib=3.11.0
