@@ -1,33 +1,41 @@
 from flask import Flask, request
-from flask import render_template_string
 import hashlib
 
 app = Flask(__name__)
 
-# hash in hex : message as string
-hash_map = {}
+# hash map as hex:message
+messages = {}
 
 @app.route('/')
 def index():
-	return "Hello!"
-
+    return "Hello!"
 
 @app.route('/messages')
 def get_messages():
-	return hash_map
-
-@app.route('/messages/<hash>')
-def get_message(hash):
-	value = hash_map.get(hash)
-	if value is None:
-		return render_template_string('PageNotFound {{ errorCode }}', errorCode='404'), 404
-	else:
-		return value
-
+    return messages
 
 @app.route('/messages', methods=['POST'])
 def add_message():
-	message = request.json['message']
-	hash_value = hashlib.sha256(message.encode('utf-8')).hexdigest()
-	hash_map[hash_value] = message
-	return hash_value
+    # Get the message from the request
+    message = request.json['message']
+    # Generate the hash of the message
+    message_hash = hashlib.sha256(message.encode('utf-8')).hexdigest()
+
+    # Store the message with its hash as the key
+    messages[message_hash] = message
+
+    # Return the hash of the message
+    return message_hash
+
+@app.route('/messages/<hash>', methods=['GET'])
+def get_message(hash):
+    # Check if the hash exists in the messages dictionary
+    if hash in messages:
+        # If it exists, return the message
+        return messages[hash]
+    else:
+        # If it does not exist, return a 404 error
+        return 'Error: Message not found', 404
+
+if __name__ == '__main__':
+    app.run()
